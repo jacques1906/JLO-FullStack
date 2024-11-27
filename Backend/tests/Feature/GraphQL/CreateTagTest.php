@@ -28,4 +28,4 @@ class CreateTagTest extends TestCase
             ]
         ]);
     }
-} 
+}

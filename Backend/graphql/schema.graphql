@@ -16,4 +16,9 @@ type Query {
     task(id: ID! @eq): Task @find
 }
 
+type Mutation {
+    createTask(description: String!): Task! @create
+    updateTaskStatus(id: ID!, status: TaskStatus!): Task! @update
+}
+
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")

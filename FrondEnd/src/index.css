@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-color: #000000;
+  --text-color: #AF8D86;
+  --accent-color: #EDBFC6;
+  --secondary-background: #1a1a1a;
+  --tertiary-background: #2a2a2a;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text min-h-screen min-w-[320px] m-0;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-text hover:text-accent transition-colors duration-300 px-4 py-2;
+  }
+  
+  .nav-link.active {
+    @apply text-accent border-b-2 border-accent;
+  }
+}
+

@@ -28,7 +28,7 @@ type Query {
 }
 
 type Mutation {
-    createTask(description: String!): Task! @create
+    createTask(description: String!, tag_ids: [ID!]): Task! @field(resolver: "CreateTaskWithTags")
     updateTaskStatus(id: ID!, status: TaskStatus!): Task! @update
     createTag(name: String!): Tag! @create
     attachTag(task_id: ID!, tag_id: ID!): Task! @field(resolver: "AttachTag")

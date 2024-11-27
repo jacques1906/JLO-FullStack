@@ -2,6 +2,15 @@ type Task {
     id: ID!
     description: String!
     status: TaskStatus!
+    tags: [Tag!]! @belongsToMany
+    created_at: DateTime!
+    updated_at: DateTime!
+}
+
+type Tag {
+    id: ID!
+    name: String!
+    tasks: [Task!]! @belongsToMany
     created_at: DateTime!
     updated_at: DateTime!
 }
@@ -14,11 +23,15 @@ enum TaskStatus {
 type Query {
     tasks: [Task!]! @all
     task(id: ID! @eq): Task @find
+    tags: [Tag!]! @all
+    tag(id: ID! @eq): Tag @find
 }
 
 type Mutation {
     createTask(description: String!): Task! @create
     updateTaskStatus(id: ID!, status: TaskStatus!): Task! @update
+    createTag(name: String!): Tag! @create
+    attachTag(task_id: ID!, tag_id: ID!): Task! @field(resolver: "AttachTag")
 }
 
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 interface TaskFormProps {
-  onSubmit: (text: string) => void
+  onSubmit: (description: string) => void
 }
 
 const TaskForm = ({ onSubmit }: TaskFormProps) => {

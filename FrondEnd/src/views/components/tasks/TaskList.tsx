@@ -1,93 +1,59 @@
-import { useEffect } from 'react'
+
 import TaskItem from './TaskItem'
 import TaskForm from './TaskForm'
 import TaskHeader from './TaskHeader'
 import Notification from '../common/Notification'
 import { useNotification } from '../../../hooks/useNotification'
 import { useTaskController } from '../../../hooks/useTaskController'
+import { Task } from '../../../types/task'
 
 interface TaskListProps {
   showPendingOnly?: boolean
   showCompletedOnly?: boolean
 }
 
-const TaskList = ({ showPendingOnly, showCompletedOnly }: TaskListProps) => {
-  const { notification, showNotification, hideNotification, pauseNotificationTimer, resumeNotificationTimer } = useNotification()
-  const { tasks, controller, updateTasks } = useTaskController()
+const TaskList = ({ showPendingOnly = false, showCompletedOnly = false }: TaskListProps) => {
+  const { notification, showNotification, hideNotification, pauseNotificationTimer, resumeNotificationTimer } = useNotification();
+  const { 
+    tasks,
+    loading, 
+    error, 
+    addTask, 
+    toggleTask, 
+    getPendingTasks, 
+    getCompletedTasks, 
+    deleteCompletedTasks 
+  } = useTaskController();
 
-  useEffect(() => {
-    updateTasks()
-  }, [])
+  if (loading) return <div>Chargement...</div>;
+  if (error) return <div>Erreur: {error.message}</div>;
 
-  const handleAddTask = (text: string) => {
-    controller.addTask(text)
-    showNotification('Nouvelle tâche ajoutée')
-  }
+  const handleAddTask = async (description: string) => {
+    await addTask(description);
+    showNotification('Nouvelle tâche ajoutée');
+  };
 
-  const handleToggleTask = (taskId: number) => {
-    controller.toggleTask(taskId)
-    showNotification('Statut de la tâche mis à jour')
-  }
+  const handleToggleTask = async (taskId: string) => {
+    await toggleTask(taskId);
+    showNotification('Statut de la tâche mis à jour');
+  };
 
-  const handleDeleteCompleted = () => {
-    controller.deleteCompletedTasks()
-    showNotification('Toutes les tâches terminées ont été supprimées')
-  }
+  const handleDeleteCompleted = async () => {
+    await deleteCompletedTasks();
+    showNotification('Toutes les tâches terminées ont été supprimées');
+  };
 
-  if (!showPendingOnly && !showCompletedOnly) {
-    const pendingTasks = controller.getPendingTasks()
-    const completedTasks = controller.getCompletedTasks()
-
-    return (
-      <div className="space-y-8">
-        {notification && (
-          <Notification 
-            message={notification} 
-            onClose={hideNotification}
-            onMouseEnter={pauseNotificationTimer}
-            onMouseLeave={resumeNotificationTimer}
-          />
-        )}
-        <TaskForm onSubmit={handleAddTask} />
-        
-        <div className="space-y-8">
-          <div className="space-y-6">
-            <TaskHeader title="Tâches en cours" showDeleteButton={false} onDeleteAll={() => {}} />
-            <ul className="space-y-3">
-              {pendingTasks.map(task => (
-                <TaskItem key={task.id} task={task} onToggle={handleToggleTask} />
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-6">
-            <TaskHeader 
-              title="Tâches terminées" 
-              showDeleteButton={completedTasks.length > 0}
-              onDeleteAll={handleDeleteCompleted}
-            />
-            <ul className="space-y-3">
-              {completedTasks.map(task => (
-                <TaskItem key={task.id} task={task} onToggle={handleToggleTask} />
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const filteredTasks = showPendingOnly 
-    ? controller.getPendingTasks()
+  const filteredTasks: Task[] = showPendingOnly 
+    ? getPendingTasks()
     : showCompletedOnly 
-    ? controller.getCompletedTasks()
-    : tasks
+    ? getCompletedTasks()
+    : tasks;
 
   const pageTitle = showCompletedOnly 
     ? "Tâches terminées"
     : showPendingOnly 
     ? "Tâches en cours"
-    : "Toutes les tâches"
+    : "Toutes les tâches";
 
   return (
     <div className="space-y-8">
@@ -113,7 +79,7 @@ const TaskList = ({ showPendingOnly, showCompletedOnly }: TaskListProps) => {
         </ul>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TaskList 
+export default TaskList; 

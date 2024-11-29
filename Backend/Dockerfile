@@ -10,7 +10,11 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    nginx
+
+# Configuration de Nginx
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -46,4 +50,4 @@ RUN php artisan optimize
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0"]
+CMD service nginx start && php-fpm

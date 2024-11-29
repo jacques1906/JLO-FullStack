@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->text('description');
+            $table->text('task_description')->nullable();
             $table->enum('status', ['in_progress', 'completed'])->default('in_progress');
             $table->timestamps();
         });

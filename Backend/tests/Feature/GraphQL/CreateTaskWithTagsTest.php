@@ -18,12 +18,10 @@ class CreateTaskWithTagsTest extends TestCase
 
     public function test_can_create_task_with_tags(): void
     {
-        // Arrange
         $tag = Tag::create([
             'name' => 'urgent'
         ]);
 
-        // Act
         $response = $this->graphQL(/** @lang GraphQL */ '
             mutation($description: String!, $tag_ids: [ID!]) {
                 createTask(
@@ -44,7 +42,6 @@ class CreateTaskWithTagsTest extends TestCase
             'tag_ids' => [$tag->id]
         ]);
 
-        // Assert
         $response->assertJson([
             'data' => [
                 'createTask' => [

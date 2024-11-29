@@ -5,27 +5,43 @@ export function useTaskController() {
   const { tasks, loading, error, refetch } = useTasksQuery()
   const { createTask, updateTaskStatus } = useTaskMutations()
 
-  const addTask = async (description: string) => {
-    await createTask({ variables: { description } })
-    refetch()
+  const addTask = async (description: string, taskDescription: string, tagIds: string[] = []) => {
+    try {
+      console.log('Controller input:', { description, taskDescription, tagIds });
+      
+      const sanitizedDescription = taskDescription || '';
+      
+      const result = await createTask(
+        description,
+        sanitizedDescription,
+        tagIds
+      );
+      
+      console.log('Controller result:', result);
+      await refetch();
+      return result;
+    } catch (error) {
+      console.error('Controller error:', error);
+      throw error;
+    }
   }
 
   const toggleTask = async (taskId: string) => {
-    const task = tasks?.find(t => t.id === taskId)
+    const task = tasks?.find((t: Task) => t.id === taskId)
     if (task) {
-      const newStatus = task.status === 'completed' ? 'in_progress' : 'completed'
-      await updateTaskStatus({ variables: { id: taskId, status: newStatus } })
+      const newStatus: TaskStatus = task.status === 'completed' ? 'in_progress' : 'completed'
+      await updateTaskStatus(task.id, newStatus)
       refetch()
     }
   }
 
-  const getPendingTasks = () => tasks?.filter(task => task.status === 'in_progress') || []
-  const getCompletedTasks = () => tasks?.filter(task => task.status === 'completed') || []
+  const getPendingTasks = () => tasks?.filter((task: Task) => task.status === 'in_progress') || []
+  const getCompletedTasks = () => tasks?.filter((task: Task) => task.status === 'completed') || []
 
   const deleteCompletedTasks = async () => {
-    const completedTasks = tasks?.filter(task => task.status === 'completed') || []
+    const completedTasks = tasks?.filter((task: Task) => task.status === 'completed') || []
     for (const task of completedTasks) {
-      await updateTaskStatus({ variables: { id: task.id, status: 'in_progress' } })
+      await updateTaskStatus(task.id, 'in_progress')
     }
     await refetch()
   }

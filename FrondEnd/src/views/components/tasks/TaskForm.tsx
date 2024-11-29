@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import { useQuery, useMutation } from '@apollo/client'
-import { GET_TAGS, CREATE_TAG, DELETE_TAG } from '../../../hooks/useGraphQL'
+import { useQuery } from '@apollo/client'
+import { GET_TAGS } from '../../../hooks/useGraphQL'
 import { useTagMutations } from '../../../hooks/useGraphQL'
 
 interface TaskFormProps {
-  onSubmit: (description: string, tagIds: string[]) => void
+  onSubmit: (title: string, description: string, tagIds: string[]) => void
 }
 
 const TaskForm = ({ onSubmit }: TaskFormProps) => {
   const [newTask, setNewTask] = useState('')
+  const [taskDescription, setTaskDescription] = useState('')
   const [tagInput, setTagInput] = useState('')
   const [selectedTagId, setSelectedTagId] = useState<string>('')
   
@@ -30,8 +31,9 @@ const TaskForm = ({ onSubmit }: TaskFormProps) => {
       }
     }
 
-    onSubmit(newTask.trim(), finalTagId ? [finalTagId] : [])
+    onSubmit(newTask.trim(), taskDescription.trim(), finalTagId ? [finalTagId] : [])
     setNewTask('')
+    setTaskDescription('')
     setTagInput('')
     setSelectedTagId('')
   }
@@ -48,13 +50,25 @@ const TaskForm = ({ onSubmit }: TaskFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col gap-4">
-        <input
-          type="text"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Ajouter une nouvelle tâche..."
-          className="px-4 py-3 rounded-lg bg-tertiary text-text placeholder-text/50 border-2 border-accent/20 focus:border-accent focus:ring-2 focus:ring-accent/30 outline-none"
-        />
+        <div className="flex flex-col">
+          <label className="text-text mb-1">Description:</label>
+          <input
+            type="text"
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            placeholder="Titre de la tâche..."
+            className="px-4 py-3 rounded-lg bg-tertiary text-text placeholder-text/50 border-2 border-accent/20 focus:border-accent focus:ring-2 focus:ring-accent/30 outline-none"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="text-text mb-1">Description détaillée:</label>
+          <textarea
+            value={taskDescription}
+            onChange={(e) => setTaskDescription(e.target.value)}
+            placeholder="Description de la tâche (optionnel)..."
+            className="px-4 py-3 rounded-lg bg-tertiary text-text placeholder-text/50 border-2 border-accent/20 focus:border-accent focus:ring-2 focus:ring-accent/30 outline-none resize-none h-24"
+          />
+        </div>
         <div className="flex gap-4">
           <input
             type="text"

@@ -31,6 +31,10 @@ class TaskTest extends TestCase
                     id
                     description
                     status
+                    tags {
+                        id
+                        name
+                    }
                 }
             }
         ');
@@ -42,7 +46,8 @@ class TaskTest extends TestCase
                     '*' => [
                         'id',
                         'description',
-                        'status'
+                        'status',
+                        'tags'
                     ]
                 ]
             ]

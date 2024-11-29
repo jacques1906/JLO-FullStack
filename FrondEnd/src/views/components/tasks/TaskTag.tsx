@@ -1,13 +1,17 @@
 interface TaskTagProps {
   name: string;
+  description?: string;
 }
 
-const TaskTag = ({ name }: TaskTagProps) => {
+const TaskTag = ({ name, description }: TaskTagProps) => {
   return (
-    <span className="inline-block bg-accent/20 text-accent text-sm px-2 py-1 rounded-full">
+    <div 
+      className="px-2 py-1 bg-accent/10 text-accent rounded text-sm"
+      title={description || ''}
+    >
       {name}
-    </span>
-  );
-};
+    </div>
+  )
+}
 
 export default TaskTag; 

@@ -1,6 +1,7 @@
 type Task {
     id: ID!
     description: String!
+    task_description: String
     status: TaskStatus!
     tags: [Tag!] @belongsToMany
     created_at: DateTime!
@@ -10,6 +11,7 @@ type Task {
 type Tag {
     id: ID!
     name: String!
+    description: String
     tasks: [Task!]! @belongsToMany
     created_at: DateTime!
     updated_at: DateTime!
@@ -28,9 +30,13 @@ type Query {
 }
 
 type Mutation {
-    createTask(description: String!, tag_ids: [ID]): Task! @field(resolver: "CreateTaskWithTags")
+    createTask(
+        description: String!, 
+        task_description: String,
+        tag_ids: [ID]
+    ): Task! @field(resolver: "CreateTaskWithTags")
     updateTaskStatus(id: ID!, status: TaskStatus!): Task! @update
-    createTag(name: String!): Tag! @create
+    createTag(name: String!, description: String): Tag! @create
     attachTag(task_id: ID!, tag_id: ID!): Task! @field(resolver: "AttachTag")
     deleteTask(id: ID!): Task @delete
     deleteCompletedTasks: DeleteResponse! @field(resolver: "DeleteCompletedTasks")

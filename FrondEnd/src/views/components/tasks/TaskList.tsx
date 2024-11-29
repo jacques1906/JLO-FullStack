@@ -27,8 +27,8 @@ const TaskList = ({ showPendingOnly = false, showCompletedOnly = false }: TaskLi
   if (loading) return <div>Chargement...</div>;
   if (error) return <div>Erreur: {error.message}</div>;
 
-  const handleAddTask = async (description: string, tagIds: string[] = []) => {
-    await addTask(description, tagIds);
+  const handleAddTask = async (title: string, description: string, tagIds: string[] = []) => {
+    await addTask(title, description, tagIds);
     showNotification('Nouvelle tâche ajoutée');
   };
 

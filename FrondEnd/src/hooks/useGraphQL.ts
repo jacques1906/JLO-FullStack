@@ -1,10 +1,11 @@
 import { useQuery, useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
-import { Task, TaskStatus } from '../types/task';
+import { TaskStatus } from '../types/task';
 
 const TASK_FIELDS = `
   id
   description
+  task_description
   status
   created_at
   updated_at
@@ -23,8 +24,8 @@ export const GET_TASKS = gql`
 `;
 
 export const CREATE_TASK = gql`
-  mutation CreateTask($description: String!, $tag_ids: [ID!]) {
-    createTask(description: $description, tag_ids: $tag_ids) {
+  mutation CreateTask($description: String!, $task_description: String, $tag_ids: [ID!]) {
+    createTask(description: $description, task_description: $task_description, tag_ids: $tag_ids) {
       ${TASK_FIELDS}
     }
   }
@@ -97,9 +98,13 @@ export function useTaskMutations() {
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
   const [deleteCompletedTasksMutation] = useMutation(DELETE_COMPLETED_TASKS);
 
-  const createTask = async (description: string, tagIds: string[] = []) => {
+  const createTask = async (description: string, task_description: string, tagIds: string[] = []) => {
     const { data } = await createTaskMutation({ 
-      variables: { description, tag_ids: tagIds } 
+      variables: { 
+        description, 
+        task_description,
+        tag_ids: tagIds 
+      } 
     });
     return data.createTask;
   };

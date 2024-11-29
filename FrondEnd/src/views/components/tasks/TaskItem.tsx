@@ -23,16 +23,27 @@ const TaskItem = ({ task, onToggle }: TaskItemProps) => {
             onChange={() => onToggle(task.id)}
             className="w-5 h-5 rounded border-accent/20"
           />
-          <span className={`${task.status === 'completed' ? 'line-through text-text/50' : ''}`}>
-            {task.description}
-          </span>
+          <div className="flex flex-col">
+            <span className={`${task.status === 'completed' ? 'line-through text-text/50' : ''}`}>
+              tâche: {task.description}
+            </span>
+            {task.task_description && (
+              <span className="text-sm text-text/70 mt-1 italic">
+                description détaillée: {task.task_description}
+              </span>
+            )}
+          </div>
         </div>
         {task.tags && task.tags.length > 0 && (
           <div className="flex items-center gap-2 ml-7">
             <span className="text-sm text-text/70">Tags:</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {task.tags.map(tag => (
-                <TaskTag key={tag.id} name={tag.name} />
+                <TaskTag 
+                  key={tag.id} 
+                  name={tag.name} 
+                  description={tag.description}
+                />
               ))}
             </div>
           </div>

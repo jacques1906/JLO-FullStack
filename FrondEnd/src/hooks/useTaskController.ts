@@ -1,12 +1,12 @@
 import { useTasksQuery, useTaskMutations } from './useGraphQL'
-import { TaskStatus } from '../types/task';
+import { TaskStatus, Task } from '../types/task';
 
 export const useTaskController = () => {
-  const { tasks, loading, error, refetch } = useTasksQuery()
-  const { createTask: createTaskMutation, updateTaskStatus } = useTaskMutations()
+  const { tasks, loading, error, refetch } = useTasksQuery();
+  const { createTask: createTaskMutation, updateTaskStatus, deleteCompletedTasks: deleteCompletedTasksMutation } = useTaskMutations();
 
-  const addTask = async (description: string) => {
-    await createTaskMutation(description)
+  const addTask = async (description: string, tagIds: string[] = []) => {
+    await createTaskMutation(description, tagIds)
     refetch()
   }
 
@@ -23,11 +23,13 @@ export const useTaskController = () => {
   const getCompletedTasks = () => tasks.filter(task => task.status === 'completed')
 
   const deleteCompletedTasks = async () => {
-    const completedTasks = getCompletedTasks()
-    await Promise.all(
-      completedTasks.map(task => updateTaskStatus(task.id, 'in_progress'))
-    )
-    refetch()
+    try {
+      await deleteCompletedTasksMutation();
+      await refetch();
+    } catch (error) {
+      console.error('Erreur lors de la suppression des tâches:', error);
+      throw error;
+    }
   }
 
   return {

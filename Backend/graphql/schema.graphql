@@ -2,7 +2,7 @@ type Task {
     id: ID!
     description: String!
     status: TaskStatus!
-    tags: [Tag!]! @belongsToMany
+    tags: [Tag!] @belongsToMany
     created_at: DateTime!
     updated_at: DateTime!
 }
@@ -28,10 +28,17 @@ type Query {
 }
 
 type Mutation {
-    createTask(description: String!, tag_ids: [ID!]): Task! @field(resolver: "CreateTaskWithTags")
+    createTask(description: String!, tag_ids: [ID]): Task! @field(resolver: "CreateTaskWithTags")
     updateTaskStatus(id: ID!, status: TaskStatus!): Task! @update
     createTag(name: String!): Tag! @create
     attachTag(task_id: ID!, tag_id: ID!): Task! @field(resolver: "AttachTag")
+    deleteTask(id: ID!): Task @delete
+    deleteCompletedTasks: DeleteResponse! @field(resolver: "DeleteCompletedTasks")
+    deleteTag(id: ID! @eq): Tag! @delete
+}
+
+type DeleteResponse {
+    count: Int!
 }
 
 scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")

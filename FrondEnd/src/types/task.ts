@@ -9,7 +9,7 @@ export interface Task {
   id: string;
   description: string;
   status: TaskStatus;
+  tags: Tag[];
   created_at: string;
   updated_at: string;
-  tags?: Tag[];
 } 

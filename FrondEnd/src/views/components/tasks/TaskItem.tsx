@@ -1,4 +1,5 @@
 import { Task } from '../../../types/task'
+import TaskTag from './TaskTag'
 
 interface TaskItemProps {
   task: Task
@@ -6,21 +7,41 @@ interface TaskItemProps {
 }
 
 const TaskItem = ({ task, onToggle }: TaskItemProps) => {
+  const formattedDate = new Date(task.created_at).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
   return (
-    <li className="flex items-center gap-4 p-4 bg-tertiary rounded-lg">
-      <input
-        type="checkbox"
-        checked={task.status === 'completed'}
-        onChange={() => onToggle(task.id)}
-        className="w-5 h-5 accent-accent"
-      />
-      <span className={`flex-1 ${task.status === 'completed' ? 'line-through opacity-50' : ''}`}>
-        {task.description}
-      </span>
-      <span className="text-sm opacity-50">
-        {new Date(task.created_at).toLocaleDateString()}
-      </span>
-    </li>
+    <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={task.status === 'completed'}
+            onChange={() => onToggle(task.id)}
+            className="w-5 h-5 rounded border-accent/20"
+          />
+          <span className={`${task.status === 'completed' ? 'line-through text-text/50' : ''}`}>
+            {task.description}
+          </span>
+        </div>
+        {task.tags && task.tags.length > 0 && (
+          <div className="flex items-center gap-2 ml-7">
+            <span className="text-sm text-text/70">Tags:</span>
+            <div className="flex gap-2">
+              {task.tags.map(tag => (
+                <TaskTag key={tag.id} name={tag.name} />
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="text-sm text-text/50 ml-7">
+          Créée le {formattedDate}
+        </div>
+      </div>
+    </div>
   )
 }
 

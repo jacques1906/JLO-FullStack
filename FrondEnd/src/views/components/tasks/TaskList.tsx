@@ -1,4 +1,3 @@
-
 import TaskItem from './TaskItem'
 import TaskForm from './TaskForm'
 import TaskHeader from './TaskHeader'
@@ -28,8 +27,8 @@ const TaskList = ({ showPendingOnly = false, showCompletedOnly = false }: TaskLi
   if (loading) return <div>Chargement...</div>;
   if (error) return <div>Erreur: {error.message}</div>;
 
-  const handleAddTask = async (description: string) => {
-    await addTask(description);
+  const handleAddTask = async (description: string, tagIds: string[] = []) => {
+    await addTask(description, tagIds);
     showNotification('Nouvelle tâche ajoutée');
   };
 

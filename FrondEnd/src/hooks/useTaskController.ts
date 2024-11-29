@@ -1,24 +1,43 @@
-import { useState, useCallback, useRef } from 'react'
-import { TaskController } from '../controllers/TaskController'
-import { Task } from '../types/task'
+import { useTasksQuery, useTaskMutations } from './useGraphQL'
+import { TaskStatus } from '../types/task';
 
 export const useTaskController = () => {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const controllerRef = useRef<TaskController>()
+  const { tasks, loading, error, refetch } = useTasksQuery()
+  const { createTask: createTaskMutation, updateTaskStatus } = useTaskMutations()
 
-  if (!controllerRef.current) {
-    controllerRef.current = new TaskController(() => {
-      setTasks([...controllerRef.current!.getTasks()])
-    })
+  const addTask = async (description: string) => {
+    await createTaskMutation(description)
+    refetch()
   }
 
-  const updateTasks = useCallback(() => {
-    controllerRef.current!.fetchTasks()
-  }, [])
+  const toggleTask = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId)
+    if (task) {
+      const newStatus = task.status === 'completed' ? 'in_progress' : 'completed'
+      await updateTaskStatus(task.id, newStatus)
+      refetch()
+    }
+  }
+
+  const getPendingTasks = () => tasks.filter(task => task.status === 'in_progress')
+  const getCompletedTasks = () => tasks.filter(task => task.status === 'completed')
+
+  const deleteCompletedTasks = async () => {
+    const completedTasks = getCompletedTasks()
+    await Promise.all(
+      completedTasks.map(task => updateTaskStatus(task.id, 'in_progress'))
+    )
+    refetch()
+  }
 
   return {
     tasks,
-    controller: controllerRef.current,
-    updateTasks
+    loading,
+    error,
+    addTask,
+    toggleTask,
+    getPendingTasks,
+    getCompletedTasks,
+    deleteCompletedTasks
   }
 }

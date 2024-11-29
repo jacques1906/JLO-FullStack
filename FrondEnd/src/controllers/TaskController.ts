@@ -1,51 +1,44 @@
-import { Task } from '../types/task'
-import { MockApiService } from '../services/MockApiService'
+import { Task, TaskStatus } from '../types/task'
+import { useTasksQuery, useTaskMutations } from '../hooks/useGraphQL'
 
-export class TaskController {
-  private tasks: Task[] = []
-  private notifyChange: () => void
+export function useTaskController() {
+  const { tasks, loading, error, refetch } = useTasksQuery()
+  const { createTask, updateTaskStatus } = useTaskMutations()
 
-  constructor(notifyChange: () => void) {
-    this.notifyChange = notifyChange
-    this.fetchTasks()
+  const addTask = async (description: string) => {
+    await createTask({ variables: { description } })
+    refetch()
   }
 
-  getTasks(): Task[] {
-    return this.tasks
-  }
-
-  getPendingTasks(): Task[] {
-    return this.tasks.filter(task => !task.completed)
-  }
-
-  getCompletedTasks(): Task[] {
-    return this.tasks.filter(task => task.completed)
-  }
-
-  async fetchTasks(): Promise<void> {
-    this.tasks = await MockApiService.getTasks()
-    this.notifyChange()
-  }
-
-  async addTask(text: string): Promise<void> {
-    const newTask = await MockApiService.addTask(text)
-    this.tasks.push(newTask)
-    this.notifyChange()
-  }
-
-  async toggleTask(taskId: number): Promise<void> {
-    const task = this.tasks.find(t => t.id === taskId)
+  const toggleTask = async (taskId: string) => {
+    const task = tasks?.find(t => t.id === taskId)
     if (task) {
-      const updatedTask = await MockApiService.updateTask(taskId, !task.completed)
-      const index = this.tasks.findIndex(t => t.id === taskId)
-      this.tasks[index] = updatedTask
-      this.notifyChange()
+      const newStatus = task.status === 'completed' ? 'in_progress' : 'completed'
+      await updateTaskStatus({ variables: { id: taskId, status: newStatus } })
+      refetch()
     }
   }
 
-  async deleteCompletedTasks(): Promise<void> {
-    await MockApiService.deleteCompletedTasks()
-    this.tasks = this.tasks.filter(task => !task.completed)
-    this.notifyChange()
+  const getPendingTasks = () => tasks?.filter(task => task.status === 'in_progress') || []
+  const getCompletedTasks = () => tasks?.filter(task => task.status === 'completed') || []
+
+  const deleteCompletedTasks = async () => {
+    const completedTasks = tasks?.filter(task => task.status === 'completed') || []
+    for (const task of completedTasks) {
+      await updateTaskStatus({ variables: { id: task.id, status: 'in_progress' } })
+    }
+    await refetch()
+  }
+
+  return {
+    tasks: tasks || [],
+    loading,
+    error,
+    addTask,
+    toggleTask,
+    getPendingTasks,
+    getCompletedTasks,
+    deleteCompletedTasks,
+    refetch
   }
 }

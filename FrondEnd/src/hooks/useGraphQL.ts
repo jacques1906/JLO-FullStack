@@ -5,7 +5,6 @@ import { TaskStatus } from '../types/task';
 const TASK_FIELDS = `
   id
   description
-  task_description
   status
   created_at
   updated_at
@@ -101,7 +100,7 @@ export function useTaskMutations() {
   const createTask = async (description: string, task_description: string, tagIds: string[] = []) => {
     const { data } = await createTaskMutation({ 
       variables: { 
-        description, 
+        description,
         task_description,
         tag_ids: tagIds 
       } 

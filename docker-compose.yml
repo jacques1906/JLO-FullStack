@@ -7,6 +7,9 @@ services:
       - "8000:8000"
     volumes:
       - ./Backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - backend_storage:/var/www/html/storage
+      - sqlite_data:/var/www/html/database
     environment:
       - APP_URL=http://localhost:8000
       - CORS_ALLOWED_ORIGINS=http://localhost:5173
@@ -30,3 +33,8 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  backend_vendor:
+  backend_storage:
+  sqlite_data:

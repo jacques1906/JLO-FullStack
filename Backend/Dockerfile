@@ -11,7 +11,12 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    nginx
+    nginx \
+    sqlite3 \
+    libsqlite3-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev
 
 # Configuration de Nginx
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
@@ -20,33 +25,32 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create necessary directories
-RUN mkdir -p /var/www/html/resources/views \
+# Copy application files first
+COPY . .
+COPY .env.example .env
+
+# Create necessary directories and set permissions
+RUN mkdir -p /var/www/html/database \
+    && mkdir -p /var/www/html/resources/views \
     && mkdir -p /var/www/html/storage/framework/views \
     && mkdir -p /var/www/html/storage/framework/cache \
     && mkdir -p /var/www/html/storage/framework/sessions \
-    && mkdir -p /var/www/html/storage/logs
+    && mkdir -p /var/www/html/storage/logs \
+    && touch /var/www/html/resources/views/.gitkeep \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/database /var/www/html/resources
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage
-
-# Copy application files
-COPY . .
-
-# Copy .env.example to .env
-COPY .env.example .env
-
-# Install dependencies
-RUN composer install
-
-# Generate key and optimize
-RUN php artisan key:generate
-RUN php artisan optimize
+# Install dependencies and setup application
+RUN composer install \
+    && touch database/database.sqlite \
+    && php artisan key:generate \
+    && php artisan optimize
 
 EXPOSE 8000
 

@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:21-alpine as build
 
 WORKDIR /app
 
@@ -7,6 +7,13 @@ RUN yarn install
 
 COPY . .
 
-EXPOSE 3000
+RUN yarn run build
 
-CMD ["yarn", "dev", "--host"]
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 5173
+
+CMD ["nginx", "-g", "daemon off;"]

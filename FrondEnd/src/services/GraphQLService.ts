@@ -10,9 +10,14 @@ export class GraphQLService {
           tasks {
             id
             description
+            task_description
             status
             created_at
             updated_at
+            tags {
+              id
+              name
+            }
           }
         }
       `

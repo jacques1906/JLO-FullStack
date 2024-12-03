@@ -5,6 +5,7 @@ import { TaskStatus } from '../types/task';
 const TASK_FIELDS = `
   id
   description
+  task_description
   status
   created_at
   updated_at

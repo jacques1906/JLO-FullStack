@@ -21,13 +21,13 @@ class TaskType extends GraphQLType
                 'type' => Type::nonNull(Type::id()),
                 'description' => 'The id of the task'
             ],
-            'title' => [
+            'description' => [
                 'type' => Type::nonNull(Type::string()),
                 'description' => 'The title of the task'
             ],
-            'description' => [
+            'task_description' => [
                 'type' => Type::string(),
-                'description' => 'The description of the task'
+                'description' => 'The detailed description of the task'
             ],
             'status' => [
                 'type' => Type::nonNull(Type::string()),

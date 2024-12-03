@@ -9,11 +9,9 @@ export function useTaskController() {
     try {
       console.log('Controller input:', { description, taskDescription, tagIds });
       
-      const sanitizedDescription = taskDescription || '';
-      
       const result = await createTask(
         description,
-        sanitizedDescription,
+        taskDescription || '',
         tagIds
       );
       
